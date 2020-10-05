@@ -22,7 +22,7 @@ class PlayerInputComponent implements InputComponent, InputObserver{
 
     //interface called from the onTouchEvent
     @Override
-    public void handleInput(MotionEvent event, GameState gs, ArrayList<Rect> controls) {
+    public void handleInput(MotionEvent event, GameState gs, ArrayList<Rect> buttons) {
         int i = event.getActionIndex();
         int x = (int) event.getX(i);
         int y = (int) event.getY(i);
@@ -49,7 +49,7 @@ class PlayerInputComponent implements InputComponent, InputObserver{
                     mPLS.spawnPlayerLaser(mTransform);
                 }
             case MotionEvent.ACTION_POINTER_UP:
-                if(buttons.get(HUD.UP).contains(x,y) || buttons.get(HUD.DOWN).contains(x,u)){
+                if(buttons.get(HUD.UP).contains(x,y) || buttons.get(HUD.DOWN).contains(x,y)){
                     //;layer has released either up or down
                     mTransform.stopVertical();
                 }

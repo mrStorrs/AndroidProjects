@@ -11,7 +11,7 @@ import android.content.Context;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-class GameEngine extends SurfaceView implements Runnable, GameStarter, GameEngineBroadcaster,
+class GameEngine extends SurfaceView implements Runnable, GameStarter, GameEngineBroadcaster
                         ,PlayerLaserSpawner{
     private Thread mThread = null;
     private long mFPS;
@@ -26,6 +26,7 @@ class GameEngine extends SurfaceView implements Runnable, GameStarter, GameEngin
     Renderer mRenderer;
     ParticleSystem mParticleSystem;
     PhysicsEngine mPhysicsEngine;
+    Level mLevel;
 
     //constructor
     public GameEngine(Context context, Point size){
@@ -36,8 +37,11 @@ class GameEngine extends SurfaceView implements Runnable, GameStarter, GameEngin
         mSoundEngine = new SoundEngine(context);
         mHUD = new HUD(size);
         mRenderer = new Renderer(this);
+
         mParticleSystem = new ParticleSystem();
         mPhysicsEngine = new PhysicsEngine();
+
+        mLevel = new Level(context, new PointF(size.x, size.y), this);
 
         //choose the amount of particles
         mParticleSystem.init(1000);
@@ -53,19 +57,20 @@ class GameEngine extends SurfaceView implements Runnable, GameStarter, GameEngin
 
         while (mGameState.getThreadRunning()) {
             long frameStartTime = System.currentTimeMillis();
+            ArrayList<GameObject> objects = mLevel.getGameObjects();
 
             if (!mGameState.getPaused()) {
                 //update all te game objs here.
 
                 //this call to update will evolve with proj
-                if(mPhysicsEngine.update(mFPS, mParticleSystem)){
+                if(mPhysicsEngine.update(mFPS, objects, mGameState, mSoundEngine, mParticleSystem)){
                     //player hit
                     deSpawnReSpawn();
                 }
             }
 
             //draw all the game objs here
-            mRenderer.draw(mGameState, mHUD, mParticleSystem);
+            mRenderer.draw(objects, mGameState, mHUD, mParticleSystem);
 
             //measure the FPS
             long timeThisFrame = System.currentTimeMillis() - frameStartTime;
@@ -106,11 +111,31 @@ class GameEngine extends SurfaceView implements Runnable, GameStarter, GameEngin
     }
 
     public void deSpawnReSpawn(){
-        //eventually this will despawn and respawn all game obj
+        //depsawn then respawn all game objects
+        ArrayList<GameObject> objects = mLevel.getGameObjects();
+
+        // set each of the gameobject instances to inactive
+        for(GameObject o : objects){
+            o.setInactive();;
+        }
+
+        //spawn player, then background
+        objects.get(Level.PLAYER_INDEX).spawn(objects.get(Level.PLAYER_INDEX).getTransform());
+        objects.get(Level.BACKGROUND_INDEX).spawn(objects.get(Level.PLAYER_INDEX).getTransform());
     }
 
     @Override
     public boolean spawnPlayerLaser(Transform transform) {
-        return false;
+        ArrayList<GameObject> objects = mLevel.getGameObjects();
+
+        if(objects.get(Level.mNextPlayerLaser).spawn(transform)){
+            Level.mNextPlayerLaser++;
+            mSoundEngine.playShoot();
+            //check if player used the last laser
+            if(Level.mNextPlayerLaser == Level.LAST_PLAYER_LASER + 1){
+                Level.mNextPlayerLaser = Level.FIRST_PLAYER_LASER;
+            }
+        }
+        return true;
     }
 }

@@ -31,7 +31,7 @@ class GameObject {
         s.setTransform(mTransform);
     }
 
-    void setTag(String tag){
+    void setmTag(String tag){
         mTag = tag;
     }
 

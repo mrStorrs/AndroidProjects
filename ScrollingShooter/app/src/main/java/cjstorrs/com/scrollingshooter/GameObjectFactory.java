@@ -14,7 +14,7 @@ class GameObjectFactory {
         mGameEngineReference = gameEngine;
     }
 
-    GameObject create(Object spec){
+    GameObject create(ObjectSpec spec){
         GameObject object = new GameObject();
 
         int numComponents = spec.getComponents().length;
@@ -47,7 +47,7 @@ class GameObjectFactory {
                     object.setMovement(new PlayerMovementComponent());
                     break;
                 case "LaserMovementComponent":
-                    object.setMovement(new LaserMovementComponent());]
+                    object.setMovement(new LaserMovementComponent());
                     break;
                 case "PlayerSpawnComponent":
                     object.setSpawner(new PlayerSpawnComponent());
