@@ -12,7 +12,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 class GameEngine extends SurfaceView implements Runnable, GameStarter, GameEngineBroadcaster
-                        ,PlayerLaserSpawner{
+                        , PlayerLaserSpawner, AlienLaserSpawner{
     private Thread mThread = null;
     private long mFPS;
 
@@ -137,5 +137,19 @@ class GameEngine extends SurfaceView implements Runnable, GameStarter, GameEngin
             }
         }
         return true;
+    }
+
+    public void spawnAlienLaser(Transform transform){
+        ArrayList<GameObject> objects = mLevel.getGameObjects();
+        //shoot laser if available
+        //pass in transform of the ship that requested the shot to be fired
+        if (objects.get(Level.mNextAlienLaser).spawn(transform)){
+            Level.mNextAlienLaser++;
+            mSoundEngine.playShoot();
+            if (Level.mNextAlienLaser == Level.LAST_ALIEN_LASER + 1){
+                //just used the last laser
+                Level.mNextAlienLaser = Level.FIRST_ALIEN_LASER;
+            }
+        }
     }
 }

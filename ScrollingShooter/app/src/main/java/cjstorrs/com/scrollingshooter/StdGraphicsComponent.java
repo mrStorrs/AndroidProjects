@@ -21,7 +21,7 @@ class StdGraphicsComponent implements GraphicsComponent{
         //load te bitmap using the id
         mBitmap = BitmapFactory.decodeResource(context.getResources(), resID);
 
-        //create a mirror imae of te bitmap if needed
+        //create a mirror image of te bitmap if needed
         Matrix matrix = new Matrix();
         matrix.setScale(-1, 1);
         mBitmapReversed = Bitmap.createBitmap(mBitmap, 0, 0,mBitmap.getWidth(),
